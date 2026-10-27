@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batuketa eta Kenketa Sortzailea</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6;
+        }
+        .heading-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .math-font {
+            font-family: 'Roboto Mono', monospace;
+        }
+        .footer-url {
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            color: #4a5568;
+        }
+        .preview-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .preview-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .preview-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        /* Inprimatzeko eta PDFrako Estilo Bereziki Optimizatuak */
+        @media print {
+            body {
+                background-color: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            header, section:first-child, .no-print {
+                display: none !important;
+            }
+            main {
+                display: block !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+            }
+            .preview-scroll {
+                background: white !important;
+                padding: 0 !important;
+                border: none !important;
+                overflow: visible !important;
+            }
+            #worksheetPaper {
+                box-shadow: none !important;
+                border: none !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                min-height: 98vh !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col">
+
+    <!-- Goi-burukoa eta Inprimatzeko/PDF Botoiak -->
+    <header class="bg-white border-b border-emerald-100 shadow-sm sticky top-0 z-20 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-md shadow-emerald-200">
+                    <i data-lucide="calculator" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="heading-font text-xl font-bold text-slate-800 leading-tight">Batuketa eta Kenketa Sortzailea</h1>
+                    <p class="text-xs text-emerald-600 font-medium">Irakasleentzako Ariketa-Orrien Sortzailea</p>
+                </div>
+            </div>
+            
+            <!-- Inprimatzeko / PDF Botoiak Bakarrik -->
+            <div class="flex items-center gap-2 flex-wrap">
+                <!-- PDF/Inprimatu ikasleentzat -->
+                <button onclick="printPDF(false)" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2.5 rounded-xl transition shadow-sm text-xs sm:text-sm">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    <span>🖨️ Inprimatu / Gorde PDF (Ikasleentzat)</span>
+                </button>
+
+                <!-- PDF/Inprimatu erantzunekin -->
+                <button onclick="printPDF(true)" class="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold px-4 py-2.5 rounded-xl transition shadow-sm text-xs sm:text-sm">
+                    <i data-lucide="file-check" class="w-4 h-4"></i>
+                    <span>📑 Inprimatu / Gorde PDF (Erantzunekin)</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Lan-eremua -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Ezkerreko Kontrol Panela -->
+        <section class="lg:col-span-5 xl:col-span-4 flex flex-col gap-5 no-print">
+            
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-5">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h2 class="heading-font text-lg font-bold text-slate-700 flex items-center gap-2">
+                        <i data-lucide="sliders" class="w-5 h-5 text-emerald-500"></i>
+                        Aukerak eta Konfigurazioa
+                    </h2>
+                    <button onclick="generateRandomOperations()" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold px-2.5 py-1.5 rounded-lg transition flex items-center gap-1.5 border border-emerald-200">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                        Berriro Sortu
+                    </button>
+                </div>
+
+                <!-- Eragiketa Mota -->
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Eragiketa Mota</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" onclick="setOpType('add')" id="btn-op-add" class="op-type-btn py-2 px-2 text-xs font-semibold rounded-xl border transition text-center flex items-center justify-center gap-1">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Batuketak
+                        </button>
+                        <button type="button" onclick="setOpType('sub')" id="btn-op-sub" class="op-type-btn py-2 px-2 text-xs font-semibold rounded-xl border transition text-center flex items-center justify-center gap-1">
+                            <i data-lucide="minus" class="w-3.5 h-3.5"></i> Kenketak
+                        </button>
+                        <button type="button" onclick="setOpType('mix')" id="btn-op-mix" class="op-type-btn py-2 px-2 text-xs font-semibold rounded-xl border transition text-center flex items-center justify-center gap-1">
+                            <i data-lucide="shuffle" class="w-3.5 h-3.5"></i> Nahasiak
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Zifra Kopurua -->
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Zifra Kopurua</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" onclick="setDigits(1)" id="btn-digits-1" class="digit-btn py-2 px-3 text-xs font-semibold rounded-xl border transition text-center">
+                            1 Zifra
+                        </button>
+                        <button type="button" onclick="setDigits(2)" id="btn-digits-2" class="digit-btn py-2 px-3 text-xs font-semibold rounded-xl border transition text-center">
+                            2 Zifra
+                        </button>
+                        <button type="button" onclick="setDigits(3)" id="btn-digits-3" class="digit-btn py-2 px-3 text-xs font-semibold rounded-xl border transition text-center">
+                            3 Zifra
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Eramandakoak / Eusteak -->
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Eramandakoak / Eusteak</label>
+                    <select id="carryingMode" onchange="generateRandomOperations()" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium text-slate-700 bg-white">
+                        <option value="any">Edonola (Nahi bezala)</option>
+                        <option value="none">Eraman gabe / Trukerik gabe</option>
+                        <option value="carrying">Eramanarekin / Trukearekin bakarrik</option>
+                    </select>
+                </div>
+
+                <!-- Izena eta Data Kontrolak -->
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-wider text-slate-400">Goi-burukoa</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                            <input type="checkbox" id="showName" checked onchange="updatePreview()" class="w-4 h-4 accent-emerald-600 rounded">
+                            <span class="text-sm font-medium text-slate-700">Izena</span>
+                        </label>
+                        <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                            <input type="checkbox" id="showDate" checked onchange="updatePreview()" class="w-4 h-4 accent-emerald-600 rounded">
+                            <span class="text-sm font-medium text-slate-700">Data</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Titulua -->
+                <div class="space-y-2">
+                    <label for="sheetTitle" class="text-xs font-bold uppercase tracking-wider text-slate-400">Titulu Nagusia</label>
+                    <input type="text" id="sheetTitle" value="BATUKETAK EGIN" oninput="updatePreview()" 
+                        class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent font-semibold text-slate-700">
+                </div>
+
+                <!-- Erantzunak erakutsi aurrebistan -->
+                <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-sm font-semibold text-slate-700 block">Erantzunak Aurrebistan</span>
+                        <span class="text-xs text-slate-400">Gorriz erakusteko</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="showAnswersToggle" onchange="renderGrid()" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                    </label>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Eskuineko Aurrebista Panela (A4 Papera) -->
+        <section class="lg:col-span-7 xl:col-span-8 flex flex-col">
+            <div class="bg-slate-200/60 p-4 sm:p-8 rounded-2xl border border-slate-200 min-h-[650px] flex flex-col items-center justify-start overflow-x-auto preview-scroll shadow-inner">
+                
+                <!-- A4 Paper-orria -->
+                <div id="worksheetPaper" class="bg-white w-full max-w-[680px] min-h-[840px] p-8 sm:p-12 rounded-lg shadow-xl border border-slate-300 flex flex-col justify-between my-auto transition-all">
+                    
+                    <div class="flex-1 flex flex-col justify-start">
+                        <!-- 1. Izena eta Data -->
+                        <div id="previewHeader" class="flex justify-between items-center border-b-2 border-slate-800 pb-3 mb-8 font-medium text-slate-800 text-sm sm:text-base">
+                            <div id="headerNameContainer" class="flex items-center gap-2">
+                                <span class="font-bold">Izena:</span>
+                                <span class="border-b border-dotted border-slate-400 w-48 sm:w-64 inline-block"></span>
+                            </div>
+                            <div id="headerDateContainer" class="flex items-center gap-2">
+                                <span class="font-bold">Data:</span>
+                                <span class="border-b border-dotted border-slate-400 w-28 sm:w-36 inline-block"></span>
+                            </div>
+                        </div>
+
+                        <!-- 2. Titulua -->
+                        <div class="text-center my-4">
+                            <h2 id="previewTitle" class="heading-font text-2xl sm:text-3xl font-extrabold tracking-wide text-slate-800 uppercase">
+                                BATUKETAK EGIN
+                            </h2>
+                        </div>
+
+                        <!-- 3. 16 Eragiketa (4 lerro x 4 eragiketa) -->
+                        <div id="operationsGrid" class="grid grid-cols-4 gap-y-10 gap-x-4 sm:gap-x-8 my-8 text-slate-900">
+                        </div>
+                    </div>
+
+                    <!-- 4. Orri-oina (Footer eleganteenarekin) -->
+                    <div class="pt-6 border-t border-slate-200 text-center">
+                        <span class="footer-url text-sm sm:text-base tracking-wide">www.maixujoxe.eus</span>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Script Funtzionala -->
+    <script>
+        let digits = 2;
+        let opType = 'add';
+        let operations = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            setOpType('add');
+            setDigits(2);
+        });
+
+        function setOpType(type) {
+            opType = type;
+            document.querySelectorAll('.op-type-btn').forEach(btn => {
+                btn.classList.remove('bg-emerald-500', 'text-white', 'border-emerald-500');
+                btn.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+            });
+
+            const activeBtn = document.getElementById(`btn-op-${type}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
+                activeBtn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-500');
+            }
+
+            const titleInput = document.getElementById('sheetTitle');
+            if (type === 'add') titleInput.value = "BATUKETAK EGIN";
+            else if (type === 'sub') titleInput.value = "KENKETAK EGIN";
+            else titleInput.value = "ERAGIKETAK EGIN";
+
+            generateRandomOperations();
+        }
+
+        function setDigits(num) {
+            digits = num;
+            document.querySelectorAll('.digit-btn').forEach(btn => {
+                btn.classList.remove('bg-emerald-500', 'text-white', 'border-emerald-500');
+                btn.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+            });
+
+            const activeBtn = document.getElementById(`btn-digits-${num}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
+                activeBtn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-500');
+            }
+
+            generateRandomOperations();
+        }
+
+        function checkCarryingOrBorrowing(a, b, currentType) {
+            let strA = a.toString().split('').reverse();
+            let strB = b.toString().split('').reverse();
+            let len = Math.max(strA.length, strB.length);
+
+            if (currentType === '+') {
+                for (let i = 0; i < len; i++) {
+                    let d1 = parseInt(strA[i] || '0', 10);
+                    let d2 = parseInt(strB[i] || '0', 10);
+                    if (d1 + d2 >= 10) return true;
+                }
+                return false;
+            } else {
+                for (let i = 0; i < len; i++) {
+                    let d1 = parseInt(strA[i] || '0', 10);
+                    let d2 = parseInt(strB[i] || '0', 10);
+                    if (d1 < d2) return true;
+                }
+                return false;
+            }
+        }
+
+        function generateRandomOperations() {
+            const carryingMode = document.getElementById('carryingMode').value;
+            operations = [];
+
+            const min = Math.pow(10, digits - 1);
+            const max = Math.pow(10, digits) - 1;
+
+            for (let i = 0; i < 16; i++) {
+                let num1, num2, currentType;
+                let valid = false;
+                let attempts = 0;
+
+                if (opType === 'mix') {
+                    currentType = Math.random() > 0.5 ? '+' : '-';
+                } else {
+                    currentType = opType === 'add' ? '+' : '-';
+                }
+
+                while (!valid && attempts < 100) {
+                    attempts++;
+                    num1 = Math.floor(Math.random() * (max - min + 1)) + min;
+                    num2 = Math.floor(Math.random() * (max - min + 1)) + min;
+
+                    if (digits === 1) {
+                        num2 = Math.floor(Math.random() * 10);
+                    }
+
+                    if (currentType === '-' && num1 < num2) {
+                        let temp = num1;
+                        num1 = num2;
+                        num2 = temp;
+                    }
+
+                    const hasCarrying = checkCarryingOrBorrowing(num1, num2, currentType);
+
+                    if (carryingMode === 'none' && !hasCarrying) valid = true;
+                    else if (carryingMode === 'carrying' && hasCarrying) valid = true;
+                    else if (carryingMode === 'any') valid = true;
+                }
+
+                operations.push({ top: num1, bottom: num2, type: currentType });
+            }
+
+            renderGrid();
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('operationsGrid');
+            const showAnswers = document.getElementById('showAnswersToggle').checked;
+            grid.innerHTML = '';
+
+            operations.forEach((op) => {
+                const item = document.createElement('div');
+                item.className = "flex flex-col items-end math-font text-base sm:text-xl leading-tight select-none p-2 rounded-lg transition hover:bg-slate-50/80 relative group";
+
+                const result = op.type === '+' ? (op.top + op.bottom) : (op.top - op.bottom);
+
+                item.innerHTML = `
+                    <div class="flex flex-col items-end border-b-2 border-slate-800 pb-1 w-full max-w-[85px]">
+                        <span class="tracking-widest">${op.top}</span>
+                        <div class="flex items-center justify-between w-full">
+                            <span class="font-bold text-slate-700">${op.type}</span>
+                            <span class="tracking-widest">${op.bottom}</span>
+                        </div>
+                    </div>
+                    <span class="result-display text-amber-600 font-bold mt-1 text-sm tracking-widest ${showAnswers ? '' : 'invisible'}">${result}</span>
+                `;
+
+                grid.appendChild(item);
+            });
+
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const showName = document.getElementById('showName').checked;
+            const showDate = document.getElementById('showDate').checked;
+            const titleText = document.getElementById('sheetTitle').value;
+
+            document.getElementById('headerNameContainer').style.display = showName ? 'flex' : 'none';
+            document.getElementById('headerDateContainer').style.display = showDate ? 'flex' : 'none';
+            
+            const header = document.getElementById('previewHeader');
+            if (!showName && !showDate) {
+                header.style.display = 'none';
+            } else {
+                header.style.display = 'flex';
+            }
+
+            document.getElementById('previewTitle').innerText = titleText || 'BATUKETAK EGIN';
+        }
+
+        function printPDF(withAnswers) {
+            const toggle = document.getElementById('showAnswersToggle');
+            const previousState = toggle.checked;
+
+            toggle.checked = withAnswers;
+            renderGrid();
+
+            setTimeout(() => {
+                window.print();
+                toggle.checked = previousState;
+                renderGrid();
+            }, 150);
+        }
+    </script>
+</body>
+</html>
